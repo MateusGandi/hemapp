@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "910976782870",
+    "project_id": "hm-notifications-54cb7",
+    "storage_bucket": "hm-notifications-54cb7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910976782870:android:36b4009ae968c5c8ed1b37",
+        "android_client_info": {
+          "package_name": "com.hemapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeP0FEj_5BafUzKSXOS_H6hOSOCtyklaY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
