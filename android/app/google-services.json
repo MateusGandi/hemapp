@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "910976782870",
-    "project_id": "hm-notifications-54cb7",
-    "storage_bucket": "hm-notifications-54cb7.firebasestorage.app"
+    "project_number": "375280479606",
+    "project_id": "hemoubiquitous-fhir",
+    "storage_bucket": "hemoubiquitous-fhir.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:910976782870:android:36b4009ae968c5c8ed1b37",
+        "mobilesdk_app_id": "1:375280479606:android:133e70ba85ebc5ab9c9e57",
         "android_client_info": {
           "package_name": "com.hemapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCeP0FEj_5BafUzKSXOS_H6hOSOCtyklaY"
+          "current_key": "AIzaSyClOKldXNQEh84ppTCrcb28LwUrZ0x7CZU"
         }
       ],
       "services": {

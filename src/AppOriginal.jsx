@@ -1,7 +1,3 @@
-// =========================
-// APP ORIGINAL REFACTORED COM 2 MOCKS + FILTROS + REQUISIÇÃO
-// =========================
-
 import React, { useEffect, useContext, useState } from 'react';
 import {
   PermissionsAndroid,
@@ -17,77 +13,257 @@ import messaging from '@react-native-firebase/messaging';
 import { AuthContext } from './auth/AuthContext';
 import BrazilMap from './components/Brazil';
 
-// =======================================
-// MOCK 1 — ESTADOS (resposta simulada de /teste1)
-// =======================================
-const mockEstados = {
-  area: { type: 'global', center: null },
-  timeWindow: {
-    from: '2025-11-16T11:44:32.654+00:00',
-    to: '2025-11-17T11:44:32.654+00:00',
-    bucket: '15m',
-    baselineFrom: '2025-11-15T11:44:32.654+00:00',
-    baselineTo: '2025-11-16T11:44:32.654+00:00',
-  },
-  metrics: {
-    total: 26500,
-    anaemic: 5000,
-    prevalence: 18.87,
-    baselinePrevalence: 15.5,
-    deltaPrevalence: 3.37,
-    deltaPercent: 21.74,
-    severity: 'moderate',
-    minSamples: 10,
-    minDistinctPatients: 5,
-  },
-  timeSeries: [
-    { uf: 'GO', total: 3000, anaemic: 600, prevalence: 60 },
-    { uf: 'SP', total: 10000, anaemic: 2000, prevalence: 30 },
-    { uf: 'RJ', total: 6500, anaemic: 900, prevalence: 10 },
-    { uf: 'MG', total: 7000, anaemic: 1500, prevalence: 80 },
-  ],
-};
+const BASE_URL = 'https://c07ae8a09d31.ngrok-free.app';
 
-// =======================================
-// MOCK 2 — MUNICÍPIOS (resposta simulada de /teste2?uf=XX)
-// =======================================
-const mockMunicipios = uf => ({
-  area: { type: 'state', state: uf },
-  timeWindow: {
-    from: '2025-11-16T11:44:32.654+00:00',
-    to: '2025-11-17T11:44:32.654+00:00',
-    bucket: '15m',
-  },
-  metrics: {
-    total: 0,
-    anaemic: 0,
-    prevalence: 0,
-    baselinePrevalence: 0,
-    deltaPrevalence: 0,
-    deltaPercent: null,
-    severity: 'none',
-    minSamples: 10,
-    minDistinctPatients: 5,
-  },
-  timeSeries: [
-    { city: 'Cidade 1', total: 1200, anaemic: 200, prevalence: 40 },
-    { city: 'Cidade 2', total: 1600, anaemic: 320, prevalence: 20 },
-  ],
-});
+// const payloadGlobal = {
+//   area: { type: 'global', city: null, state: null },
+//   metrics: {
+//     total: 2847,
+//     anaemic: 456,
+//     prevalence: 0.16,
+//     baselinePrevalence: 0.142,
+//     deltaPrevalence: 0.018,
+//     deltaPercent: 0.127,
+//     severity: 'moderate',
+//   },
+//   breakdown: {
+//     type: 'by-state',
+//     states: [
+//       {
+//         state: 'SP',
+//         metrics: {
+//           total: 1245,
+//           anaemic: 187,
+//           prevalence: 0.15,
+//           baselinePrevalence: 0.135,
+//           deltaPrevalence: 0.015,
+//           deltaPercent: 0.111,
+//           severity: 'low',
+//         },
+//       },
+//       {
+//         state: 'GO',
+//         metrics: {
+//           total: 892,
+//           anaemic: 151,
+//           prevalence: 0.169,
+//           baselinePrevalence: 0.148,
+//           deltaPrevalence: 0.021,
+//           deltaPercent: 0.142,
+//           severity: 'moderate',
+//         },
+//       },
+//       {
+//         state: 'MG',
+//         metrics: {
+//           total: 710,
+//           anaemic: 118,
+//           prevalence: 0.4,
+//           baselinePrevalence: 0.151,
+//           deltaPrevalence: 0.015,
+//           deltaPercent: 0.099,
+//           severity: 'moderate',
+//         },
+//       },
+//       {
+//         state: 'RJ',
+//         metrics: {
+//           total: 980,
+//           anaemic: 280,
+//           prevalence: 0.62,
+//           baselinePrevalence: 0.5,
+//           deltaPrevalence: 0.12,
+//           deltaPercent: 0.24,
+//           severity: 'high',
+//         },
+//       },
+//       {
+//         state: 'BA',
+//         metrics: {
+//           total: 540,
+//           anaemic: 320,
+//           prevalence: 0.88,
+//           baselinePrevalence: 0.75,
+//           deltaPrevalence: 0.13,
+//           deltaPercent: 0.173,
+//           severity: 'severe',
+//         },
+//       },
+//     ],
+//   },
+// };
+
+// const payloadStates = {
+//   SP: {
+//     area: { type: 'admin-area', state: 'SP' },
+//     metrics: {
+//       total: 1245,
+//       anaemic: 187,
+//       prevalence: 0.15,
+//       baselinePrevalence: 0.135,
+//       deltaPrevalence: 0.015,
+//       deltaPercent: 0.111,
+//       severity: 'low',
+//     },
+//     breakdown: {
+//       type: 'by-city',
+//       cities: [
+//         {
+//           city: 'São Paulo',
+//           metrics: { total: 500, anaemic: 60, prevalence: 0.12 },
+//         },
+//         {
+//           city: 'Campinas',
+//           metrics: { total: 380, anaemic: 52, prevalence: 0.137 },
+//         },
+//         {
+//           city: 'Santos',
+//           metrics: { total: 365, anaemic: 75, prevalence: 0.205 },
+//         },
+//       ],
+//     },
+//   },
+
+//   GO: {
+//     area: { type: 'admin-area', state: 'GO' },
+//     metrics: {
+//       total: 892,
+//       anaemic: 151,
+//       prevalence: 0.169,
+//       baselinePrevalence: 0.148,
+//       deltaPrevalence: 0.021,
+//       deltaPercent: 0.142,
+//       severity: 'moderate',
+//     },
+//     breakdown: {
+//       type: 'by-city',
+//       cities: [
+//         {
+//           city: 'Goiânia',
+//           metrics: { total: 487, anaemic: 85, prevalence: 0.175 },
+//         },
+//         {
+//           city: 'Aparecida de Goiânia',
+//           metrics: { total: 245, anaemic: 40, prevalence: 0.163 },
+//         },
+//         {
+//           city: 'Anápolis',
+//           metrics: { total: 160, anaemic: 26, prevalence: 0.163 },
+//         },
+//       ],
+//     },
+//   },
+
+//   MG: {
+//     area: { type: 'admin-area', state: 'MG' },
+//     metrics: {
+//       total: 710,
+//       anaemic: 118,
+//       prevalence: 0.4,
+//       baselinePrevalence: 0.151,
+//       deltaPrevalence: 0.015,
+//       deltaPercent: 0.099,
+//       severity: 'moderate',
+//     },
+//     breakdown: {
+//       type: 'by-city',
+//       cities: [
+//         {
+//           city: 'Belo Horizonte',
+//           metrics: { total: 300, anaemic: 120, prevalence: 0.4 },
+//         },
+//         {
+//           city: 'Uberlândia',
+//           metrics: { total: 220, anaemic: 76, prevalence: 0.345 },
+//         },
+//         {
+//           city: 'Contagem',
+//           metrics: { total: 190, anaemic: 60, prevalence: 0.315 },
+//         },
+//       ],
+//     },
+//   },
+
+//   RJ: {
+//     area: { type: 'admin-area', state: 'RJ' },
+//     metrics: {
+//       total: 980,
+//       anaemic: 280,
+//       prevalence: 0.62,
+//       baselinePrevalence: 0.5,
+//       deltaPrevalence: 0.12,
+//       deltaPercent: 0.24,
+//       severity: 'high',
+//     },
+//     breakdown: {
+//       type: 'by-city',
+//       cities: [
+//         {
+//           city: 'Rio de Janeiro',
+//           metrics: { total: 400, anaemic: 250, prevalence: 0.625 },
+//         },
+//         {
+//           city: 'Niterói',
+//           metrics: { total: 300, anaemic: 150, prevalence: 0.5 },
+//         },
+//         {
+//           city: 'Volta Redonda',
+//           metrics: { total: 280, anaemic: 120, prevalence: 0.428 },
+//         },
+//       ],
+//     },
+//   },
+
+//   BA: {
+//     area: { type: 'admin-area', state: 'BA' },
+//     metrics: {
+//       total: 540,
+//       anaemic: 320,
+//       prevalence: 0.88,
+//       baselinePrevalence: 0.75,
+//       deltaPrevalence: 0.13,
+//       deltaPercent: 0.173,
+//       severity: 'severe',
+//     },
+//     breakdown: {
+//       type: 'by-city',
+//       cities: [
+//         {
+//           city: 'Salvador',
+//           metrics: { total: 250, anaemic: 200, prevalence: 0.8 },
+//         },
+//         {
+//           city: 'Feira de Santana',
+//           metrics: { total: 180, anaemic: 160, prevalence: 0.88 },
+//         },
+//         {
+//           city: 'Vitória da Conquista',
+//           metrics: { total: 110, anaemic: 80, prevalence: 0.727 },
+//         },
+//       ],
+//     },
+//   },
+// };
 
 export default function AppOriginal() {
   const { logout } = useContext(AuthContext);
+  const mapSeverityTypes = {
+    none: 'Nenhuma',
+    minor: 'Baixa',
+    major: 'Moderada',
+    critical: 'Crítica',
+  };
 
   const [filter, setFilter] = useState({
     uf: null,
-    period: 'year',
-    bucket: '15m',
+    period: 'PT24H',
+    bucket: '1h',
   });
 
   const [estados, setEstados] = useState([]);
   const [municipios, setMunicipios] = useState([]);
+  const [metrics, setMetrics] = useState(null);
 
-  // ================= PERMISSÃO =================
   const requestPermission = async () => {
     try {
       const result = await PermissionsAndroid.request(
@@ -95,44 +271,94 @@ export default function AppOriginal() {
       );
       if (result === PermissionsAndroid.RESULTS.GRANTED) {
         await messaging().registerDeviceForRemoteMessages();
-        await messaging().getToken();
+        const token = await messaging().getToken();
+        console.log('FCM Token:', token);
+        await axios
+          .post(`${BASE_URL}/api/notifications/register`, {
+            token: token,
+            topic: 'anaemia-alerts-GO',
+          })
+          .catch(err => console.log('[ENVIO TOKEN]', err.message));
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   useEffect(() => {
     requestPermission();
   }, []);
 
-  // ================= BUSCA ESTADOS =================
-  const loadEstados = async () => {
+  const fetchGlobal = async () => {
     try {
-      // const res = await axios.post('/teste1', {...})
-      const res = mockEstados; // mock
-      setEstados(res.timeSeries);
-    } catch (e) {
-      console.log('Erro estados:', e);
+      const { data } = await axios.get(
+        `${BASE_URL}/api/analytics/anaemia/geo?bucket=${filter.bucket}&window=${filter.period}`,
+      );
+      console.log(
+        `${BASE_URL}/api/analytics/anaemia/geo?bucket=${filter.bucket}&window=${filter.period}`,
+        data,
+      );
+      return data;
+    } catch (error) {
+      console.log('erro buscando geral', error);
+      return {
+        breakdown: { cities: [] },
+        metrics: null,
+        breakdown: { states: [] },
+      };
     }
+  };
+
+  const fetchPorEstado = async uf => {
+    try {
+      const { data } = await axios.get(
+        `${BASE_URL}/api/analytics/anaemia/geo?state=${uf}&bucket=${filter.bucket}&window=${filter.period}`,
+      );
+      console.log(
+        `${BASE_URL}/api/analytics/anaemia/geo?state=${uf}&bucket=${filter.bucket}&window=${filter.period}`,
+        data,
+      );
+      return data;
+    } catch (error) {
+      console.log('erro buscando por uf', error);
+      return { breakdown: { cities: [] }, metrics: null };
+    }
+  };
+
+  const loadEstados = async () => {
+    const res = await fetchGlobal();
+    setMetrics(res.metrics);
+
+    const mapped = res.breakdown.states.map(s => ({
+      uf: s.state,
+      total: s.metrics.total,
+      anaemic: s.metrics.anaemic,
+      prevalence: Number((s.metrics.prevalence * 100).toFixed(1)),
+    }));
+
+    setEstados(mapped);
+  };
+
+  const loadMunicipios = async uf => {
+    const res = await fetchPorEstado(uf);
+
+    if (!res.breakdown.cities || res.breakdown.cities.length === 0) {
+      setMunicipios([]);
+      return;
+    }
+
+    const mapped = res.breakdown.cities.map(c => ({
+      city: c.city,
+      total: c.metrics.total,
+      anaemic: c.metrics.anaemic,
+      prevalence: Number((c.metrics.prevalence * 100).toFixed(1)),
+    }));
+
+    setMunicipios(mapped);
   };
 
   useEffect(() => {
     loadEstados();
-  }, [filter.period, filter.bucket]);
+  }, [filter.period]);
 
-  // ================= BUSCA MUNICÍPIOS =================
-  const loadMunicipios = async uf => {
-    try {
-      // const res = await axios.post(`/teste2?uf=${uf}`, {...})
-      const res = mockMunicipios(uf); // mock
-      setMunicipios(res.timeSeries);
-    } catch (e) {
-      console.log('Erro municípios:', e);
-    }
-  };
-
-  // ================= CORES MAPA =================
   const buildMapColors = () => {
     let colors = {};
 
@@ -148,37 +374,28 @@ export default function AppOriginal() {
         else if (p > 40) color = '#FF6666';
         else if (p > 20) color = '#FF9999';
       }
-
       colors[item.uf] = color;
     });
 
     return colors;
   };
 
-  // ================= CLIQUE ESTADO =================
   const handleSelectUF = uf => {
     setFilter(f => ({ ...f, uf }));
     loadMunicipios(uf);
   };
 
   const periodLabels = {
-    day: 'Dia',
-    week: 'Semana',
-    month: 'Mês',
-    semester: 'Semestre',
-    year: 'Ano',
-  };
-
-  const bucketLabels = {
-    '15m': '15 minutos',
-    '1h': '1 hora',
-    '1d': '1 dia',
+    PT24H: 'Dia',
+    P1W: 'Semana',
+    P1M: 'Mês',
+    P6M: 'Semestre',
+    P1Y: 'Ano',
   };
 
   return (
     <ScrollView style={{ flex: 1 }}>
       <View style={styles.container}>
-        {/* TOPO */}
         <View style={styles.topRow}>
           <Image
             source={require('./assets/logo_app_sec.png')}
@@ -190,8 +407,30 @@ export default function AppOriginal() {
         </View>
 
         <Text style={styles.title}>Monitor de Anemia</Text>
+        <View style={styles.filtersContainer}>
+          <View style={styles.filterRow}>
+            {Object.keys(periodLabels).map(key => (
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.filterOption,
+                  filter.period === key && styles.filterOptionActive,
+                ]}
+                onPress={() => setFilter(f => ({ ...f, period: key }))}
+              >
+                <Text
+                  style={[
+                    styles.filterOptionText,
+                    filter.period === key && styles.filterOptionTextActive,
+                  ]}
+                >
+                  {periodLabels[key]}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-        {/* MAPA */}
         <View style={styles.mapCard}>
           <BrazilMap
             width={320}
@@ -200,110 +439,48 @@ export default function AppOriginal() {
           />
         </View>
 
-        {/* FILTROS */}
-        <View style={styles.filtersContainer}>
-          <Text style={styles.sectionTitle}>Filtros</Text>
+        {metrics && (
+          <View style={styles.metricsContainer}>
+            <Text style={styles.sectionTitle}>Métricas Gerais</Text>
 
-          <View style={styles.filterRow}>
-            {/* PERÍODO */}
-            <View style={styles.filterColumn}>
-              <Text style={styles.filterLabel}>Período</Text>
-              {Object.keys(periodLabels).map(key => (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.filterOption,
-                    filter.period === key && styles.filterOptionActive,
-                  ]}
-                  onPress={() => setFilter(f => ({ ...f, period: key }))}
-                >
-                  <Text
-                    style={[
-                      styles.filterOptionText,
-                      filter.period === key && styles.filterOptionTextActive,
-                    ]}
-                  >
-                    {periodLabels[key]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <View style={styles.cardGrid}>
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>{metrics.total}</Text>
+                <Text style={styles.metricLabel}>Total</Text>
+              </View>
 
-            {/* BUCKET */}
-            <View style={styles.filterColumn}>
-              <Text style={styles.filterLabel}>Agrupamento</Text>
-              {Object.keys(bucketLabels).map(key => (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.filterOption,
-                    filter.bucket === key && styles.filterOptionActive,
-                  ]}
-                  onPress={() => setFilter(f => ({ ...f, bucket: key }))}
-                >
-                  <Text
-                    style={[
-                      styles.filterOptionText,
-                      filter.bucket === key && styles.filterOptionTextActive,
-                    ]}
-                  >
-                    {bucketLabels[key]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>{metrics.anaemic}</Text>
+                <Text style={styles.metricLabel}>Anêmicos</Text>
+              </View>
+
+              <View style={styles.metricCard}>
+                <Text style={[styles.metricValue, styles.prevalenceValue]}>
+                  {(metrics.prevalence * 100).toFixed(1)}%
+                </Text>
+                <Text style={styles.metricLabel}>Prevalência</Text>
+              </View>
+
+              <View style={styles.metricCard}>
+                <Text style={[styles.metricValue, styles.deltaValue]}>
+                  {metrics.deltaPrevalence > 0 ? '+' : ''}
+                  {(metrics.deltaPrevalence * 100).toFixed(2)}%
+                </Text>
+                <Text style={styles.metricLabel}>Variação</Text>
+              </View>
+
+              <View style={styles.severityCard}>
+                <Text style={styles.severityLabel}>Severidade</Text>
+                <Text style={[styles.severityValue, styles[metrics.severity]]}>
+                  {mapSeverityTypes[metrics.severity]}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        {/* MÉTRICAS */}
-        <View style={styles.metricsContainer}>
-          <Text style={styles.sectionTitle}>Métricas Gerais</Text>
+        )}
 
-          <View style={styles.cardGrid}>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>
-                {mockEstados.metrics.total.toLocaleString()}
-              </Text>
-              <Text style={styles.metricLabel}>Total de Exames</Text>
-            </View>
-
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>
-                {mockEstados.metrics.anaemic.toLocaleString()}
-              </Text>
-              <Text style={styles.metricLabel}>Anêmicos</Text>
-            </View>
-
-            <View style={styles.metricCard}>
-              <Text style={[styles.metricValue, styles.prevalenceValue]}>
-                {mockEstados.metrics.prevalence.toFixed(1)}%
-              </Text>
-              <Text style={styles.metricLabel}>Prevalência</Text>
-            </View>
-
-            <View style={styles.metricCard}>
-              <Text style={[styles.metricValue, styles.deltaValue]}>
-                {mockEstados.metrics.deltaPrevalence > 0 ? '+' : ''}
-                {mockEstados.metrics.deltaPrevalence.toFixed(2)}%
-              </Text>
-              <Text style={styles.metricLabel}>Variação</Text>
-            </View>
-
-            <View style={styles.severityCard}>
-              <Text style={styles.severityLabel}>Severidade</Text>
-              <Text
-                style={[
-                  styles.severityValue,
-                  styles[mockEstados.metrics.severity],
-                ]}
-              >
-                {mockEstados.metrics.severity.toUpperCase()}
-              </Text>
-            </View>
-          </View>
-        </View>
-        {/* MUNICÍPIOS */}
-        {filter.uf && (
-          <>
+        {filter.uf && municipios.length > 0 && (
+          <View style={styles.details}>
             <Text style={styles.sectionTitle}>Distribuição em {filter.uf}</Text>
 
             {municipios.map((c, i) => (
@@ -312,13 +489,12 @@ export default function AppOriginal() {
                   <Text style={styles.cityPercentage}>{c.prevalence}%</Text>
                   <Text style={styles.cityName}>{c.city}</Text>
                 </View>
-
-                <Text style={styles.description}>
-                  {`${c.anaemic}/${c.total} dos exames`}
-                </Text>
+                <Text
+                  style={styles.description}
+                >{`${c.anaemic}/${c.total} dos exames`}</Text>
               </View>
             ))}
-          </>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -336,68 +512,39 @@ const styles = StyleSheet.create({
   logoutText: { fontSize: 18 },
   title: { fontSize: 22, textAlign: 'center', marginVertical: 15 },
   mapCard: {
-    backgroundColor: '#EEE',
+    backgroundColor: '#eee',
     padding: 10,
     borderRadius: 12,
     marginBottom: 25,
     alignItems: 'center',
   },
-  filtersContainer: {
-    width: '100%',
-    marginBottom: 20,
+  filtersContainer: { marginBottom: 20 },
+  sectionTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
-
-  sectionTitle: { fontSize: 18, marginBottom: 10, fontWeight: 'bold' },
+  details: { paddingBottom: 15 },
   filterRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  filterColumn: { width: '45%' },
+  filterColumn: { display: 'flex' },
   filterLabel: { marginBottom: 8, fontSize: 16 },
   filterOption: {
-    padding: 10,
-    backgroundColor: '#EEE',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#eee',
     borderRadius: 8,
     marginBottom: 8,
     alignItems: 'center',
   },
-  filterOptionActive: { backgroundColor: '#3366FF' },
+  filterOptionActive: { backgroundColor: '#3366ff' },
   filterOptionText: { fontSize: 14, color: '#333' },
-  filterOptionTextActive: { color: '#FFF' },
-  cityBox: {
-    backgroundColor: '#EEE',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    width: '100%',
-  },
-
-  cityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 5,
-  },
-
-  cityPercentage: {
-    width: '10%',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-
-  cityName: {
-    width: '90%',
-    fontSize: 16,
-  },
-
-  description: {
-    width: '100%',
-    fontSize: 14,
-  },
+  filterOptionTextActive: { color: '#fff' },
   metricsContainer: {
-    width: '100%',
-    marginBottom: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#f5f5f5',
     padding: 15,
     borderRadius: 12,
+    marginBottom: 20,
   },
   cardGrid: {
     flexDirection: 'row',
@@ -412,21 +559,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: 'center',
   },
-  metricValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  metricLabel: {
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  prevalenceValue: {
-    color: '#FF6600',
-  },
-  deltaValue: {
-    color: '#FF0000',
-  },
+  metricValue: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
+  metricLabel: { fontSize: 12, textAlign: 'center' },
+  prevalenceValue: { color: '#ff6600' },
+  deltaValue: { color: '#ff0000' },
   severityCard: {
     width: '100%',
     backgroundColor: '#eee',
@@ -434,21 +570,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-  severityLabel: {
-    fontSize: 14,
-    marginBottom: 8,
+  severityLabel: { fontSize: 14, marginBottom: 8 },
+  severityValue: { fontSize: 20, fontWeight: 'bold' },
+
+  critical: { color: '#ff9900' },
+  major: { color: '#ff5500' },
+  low: { color: '#008800' },
+  none: { color: '#888' },
+
+  cityBox: {
+    backgroundColor: '#eee',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  severityValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  cityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
   },
-  none: {
-    color: '#999',
-  },
-  moderate: {
-    color: '#FF9900',
-  },
-  severe: {
-    color: '#FF0000',
-  },
+  cityPercentage: { width: '20%', fontSize: 18, fontWeight: 'bold' },
+  cityName: { width: '80%', fontSize: 16 },
+  description: { fontSize: 14 },
 });

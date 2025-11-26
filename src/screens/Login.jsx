@@ -98,11 +98,7 @@ export default function LoginScreen() {
             {isCreateMode && (
               <View style={styles.pickerContainer}>
                 <View style={styles.picker}>
-                  <Picker
-                    selectedValue={uf}
-                    onValueChange={setUf}
-                    style={styles.pickerStyle}
-                  >
+                  <Picker selectedValue={uf} onValueChange={setUf}>
                     <Picker.Item label="Selecione a UF" value="" />
                     <Picker.Item label="AC - Acre" value="AC" />
                     <Picker.Item label="AL - Alagoas" value="AL" />
@@ -175,8 +171,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
-  pickerStyle: { color: '#777' },
 
   /* ===== BLOCO 1 ===== */
   topSection: {

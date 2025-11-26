@@ -4,6 +4,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 
 export const AuthContext = createContext();
+const BASE_URL = 'https://c07ae8a09d31.ngrok-free.app';
 
 export function AuthProvider({ children }) {
   const [userToken, setUserToken] = useState(null);
@@ -21,7 +22,7 @@ export function AuthProvider({ children }) {
       return;
     }
     await axios
-      .post(`${'https://91f4b7ce10ac.ngrok-free.app'}/auth/login`, {
+      .post(`${BASE_URL}/auth/login`, {
         username,
         password,
       })
@@ -51,7 +52,7 @@ export function AuthProvider({ children }) {
       return;
     }
     await axios
-      .post(`${'https://91f4b7ce10ac.ngrok-free.app'}/auth/register`, {
+      .post(`${BASE_URL}/auth/register`, {
         nome: username,
         username: username,
         password: password,
